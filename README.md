@@ -1,8 +1,3 @@
-Here is your final, single-file Markdown code. I have integrated all your documentation, architecture details, and image references into one clean block.
-
-You can copy and paste this directly into your `README.md` on GitHub.
-
-```markdown
 # 🛡️ ZaikOS: Advanced SIEM + SOAR Automated Defense Pipeline
 
 ![ZaikOS Dashboard Preview](images/dashboard-main.png.png)
@@ -106,8 +101,6 @@ To bridge the SIEM with the custom SOAR backend, configure the Wazuh Manager to 
   </integration>
 </ossec_config>
 
-```
-
 ### 2️⃣ Forwarder Script (`custom-soar.py`)
 
 Deployed at `/var/ossec/integrations/custom-soar`, this script handles payload extraction, secure transmission, and internal logging.
@@ -187,7 +180,6 @@ TARGET_PASS=your_ssh_password
 *⚠️ In production, use SSH key authentication instead of plaintext passwords.*
 
 ---
-
 
 ### 📬 Contact
 
