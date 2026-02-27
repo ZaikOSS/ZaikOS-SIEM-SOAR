@@ -39,46 +39,12 @@ It's a full end-to-end security pipeline that autonomously detects network attac
 
 ## Dashboard Preview
 
-![ZaikOS Dashboard](images/dashboard-main.png)
+![ZaikOS Dashboard](images/dashboard-main.png.png)
 
 ---
 
 ## Architecture
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                         ZaikOS Pipeline                             │
-└─────────────────────────────────────────────────────────────────────┘
-
-  [ Attacker ]
-       │  SSH brute-force / injection
-       ▼
-  ┌─────────────┐   logs    ┌──────────────┐  webhook  ┌─────────────┐
-  │  Target VM  │ ────────► │  Wazuh SIEM  │ ────────► │  Node.js    │
-  │ (Victim)    │           │  (Level 10+) │           │  Backend    │
-  └─────────────┘           └──────────────┘           └──────┬──────┘
-                                                              │ exec
-                                                              ▼
-                                                    ┌─────────────────┐
-                                                    │  analyzer.py    │
-                                                    │  Python Engine  │
-                                                    └────────┬────────┘
-                                                             │
-                                          ┌──────────────────┼──────────────────┐
-                                          ▼                  ▼                  ▼
-                                   ┌────────────┐   ┌─────────────┐   ┌───────────────┐
-                                   │ VirusTotal │   │  AbuseIPDB  │   │  SSH → Target │
-                                   │    API     │   │     API     │   │  ufw deny <IP>│
-                                   └────────────┘   └─────────────┘   └───────────────┘
-                                          │                  │
-                                          └────────┬─────────┘
-                                                   │ verdict
-                                                   ▼
-                                         ┌──────────────────┐
-                                         │  React Dashboard │
-                                         │  (Socket.io WS)  │
-                                         └──────────────────┘
-```
 
 ![Architecture Diagram](images/architecture.png)
 
