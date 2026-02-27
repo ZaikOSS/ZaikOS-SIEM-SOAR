@@ -16,7 +16,7 @@ It autonomously detects network attacks, enriches threat data using global intel
 * [Deep Dive: System Configurations](#-deep-dive-system-configurations)
 * [Installation & Deployment](#️-installation--deployment)
 * [Environment Variables](#-environment-variables)
-* [About the Developer](#-about-the-developer)
+
 
 ---
 
@@ -184,6 +184,6 @@ TARGET_PASS=your_ssh_password
 ### 📬 Contact
 
 * **Email:** zakaria.ouadifi@usmba.ac.ma
-* **LinkedIn:** [Insert your LinkedIn URL here]
+* **LinkedIn:** https://www.linkedin.com/in/zakaria-ouadifi/
 
 ⭐ *If you found this project interesting, feel free to star the repository!*
