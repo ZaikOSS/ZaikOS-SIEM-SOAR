@@ -25,17 +25,6 @@
 
 ---
 
-## What is ZaikOS?
-
-Modern Security Operations Centers suffer from **alert fatigue**. Analysts waste hours manually checking IPs, cross-referencing threat databases, and SSH-ing into servers to block attackers.
-
-**ZaikOS eliminates that entirely.**
-
-It's a full end-to-end security pipeline that autonomously detects network attacks, enriches threat data using global intelligence APIs, permanently blocks malicious actors at the firewall level — and streams the entire operation live to a custom cyberpunk-styled SOC dashboard.
-
-> No human needed. Detection to remediation in **under 2 seconds**.
-
----
 
 ## Dashboard Preview
 
