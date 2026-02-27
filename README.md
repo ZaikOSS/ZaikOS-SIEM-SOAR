@@ -1,14 +1,5 @@
 <div align="center">
 
-```
-███████╗ █████╗ ██╗██╗  ██╗ ██████╗ ███████╗
-╚══███╔╝██╔══██╗██║██║ ██╔╝██╔═══██╗██╔════╝
-  ███╔╝ ███████║██║█████╔╝ ██║   ██║███████╗
- ███╔╝  ██╔══██║██║██╔═██╗ ██║   ██║╚════██║
-███████╗██║  ██║██║██║  ██╗╚██████╔╝███████║
-╚══════╝╚═╝  ╚═╝╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝
-```
-
 ### Advanced SIEM + SOAR Automated Defense Pipeline
 
 *Detect. Enrich. Block. Stream. — In under 2 seconds.*
@@ -126,7 +117,7 @@ The entire process — API queries, verdict, firewall action — is streamed liv
 
 ```bash
 # Copy the forwarder script
-sudo cp wazuh-integration/custom-soar /var/ossec/integrations/custom-soar
+sudo cp wazuh-integration/custom-soar.py /var/ossec/integrations/custom-soar
 
 # Set correct permissions (Wazuh requires this)
 sudo chmod 750 /var/ossec/integrations/custom-soar
