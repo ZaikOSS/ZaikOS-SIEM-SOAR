@@ -1,189 +1,305 @@
-# 🛡️ ZaikOS: Advanced SIEM + SOAR Automated Defense Pipeline
+<div align="center">
 
-![ZaikOS Dashboard Preview](images/dashboard-main.png.png)
+```
+███████╗ █████╗ ██╗██╗  ██╗ ██████╗ ███████╗
+╚══███╔╝██╔══██╗██║██║ ██╔╝██╔═══██╗██╔════╝
+  ███╔╝ ███████║██║█████╔╝ ██║   ██║███████╗
+ ███╔╝  ██╔══██║██║██╔═██╗ ██║   ██║╚════██║
+███████╗██║  ██║██║██║  ██╗╚██████╔╝███████║
+╚══════╝╚═╝  ╚═╝╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝
+```
 
-**ZaikOS** is an end-to-end Security Information and Event Management (SIEM) and Security Orchestration, Automation, and Response (SOAR) architecture. Built from the ground up, this project bridges the gap between offensive security tactics and active defensive engineering. 
+### Advanced SIEM + SOAR Automated Defense Pipeline
 
-It autonomously detects network attacks, enriches threat data using global intelligence APIs, permanently blocks malicious actors at the firewall level in milliseconds, and streams the entire process live to a custom cyberpunk-styled SOC dashboard.
+*Detect. Enrich. Block. Stream. — In under 2 seconds.*
 
----
+[![Node.js](https://img.shields.io/badge/Node.js-v18+-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
+[![Python](https://img.shields.io/badge/Python-3.8+-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org)
+[![React](https://img.shields.io/badge/React-Vite-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev)
+[![Wazuh](https://img.shields.io/badge/SIEM-Wazuh-005571?style=flat-square)](https://wazuh.com)
+[![VirusTotal](https://img.shields.io/badge/API-VirusTotal-394EFF?style=flat-square)](https://virustotal.com)
+[![AbuseIPDB](https://img.shields.io/badge/API-AbuseIPDB-CC0000?style=flat-square)](https://abuseipdb.com)
+[![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)
 
-## 📑 Table of Contents
-* [Project Overview](#-project-overview)
-* [Key Features](#-key-features)
-* [Architecture & Workflow](#-architecture--workflow)
-* [Technology Stack](#-technology-stack)
-* [Deep Dive: System Configurations](#-deep-dive-system-configurations)
-* [Installation & Deployment](#️-installation--deployment)
-* [Environment Variables](#-environment-variables)
-
-
----
-
-## 🔎 Project Overview
-Modern Security Operations Centers (SOCs) suffer from alert fatigue. ZaikOS was built to solve this by automating the triage and response phases of the incident lifecycle. 
-
-Instead of a human analyst manually checking an IP address against threat databases and logging into a server to ban them, ZaikOS handles the entire pipeline — from detection to remediation — in under 2 seconds.
+</div>
 
 ---
 
-## ✨ Key Features
+## What is ZaikOS?
 
-* **Real-Time Log Ingestion:** Wazuh agent continuously monitors `/var/log/auth.log` and Apache error logs for brute-force and SQL injection attempts.
-* **Fault-Tolerant Webhooks:** A custom Python integration script inside Wazuh securely queues and forwards Level 10+ alerts to the backend.
-* **Automated Threat Intelligence:** Instantly queries **VirusTotal** (70+ vendors) and **AbuseIPDB** to calculate a confidence score on the attacking IP.
-* **Active Automated Response (SOAR):** Utilizes `paramiko` to establish a background SSH connection to the victim machine and dynamically writes `ufw deny` firewall rules to drop the attacker.
-* **Live WebSocket Streaming:** A Node.js backend pushes threat verdicts to the frontend in real-time via `Socket.io`.
-* **Cyberpunk SOC Dashboard:** A React.js frontend featuring animated terminal output, live threat timeline graphs, and system health monitoring.
+Modern Security Operations Centers suffer from **alert fatigue**. Analysts waste hours manually checking IPs, cross-referencing threat databases, and SSH-ing into servers to block attackers.
+
+**ZaikOS eliminates that entirely.**
+
+It's a full end-to-end security pipeline that autonomously detects network attacks, enriches threat data using global intelligence APIs, permanently blocks malicious actors at the firewall level — and streams the entire operation live to a custom cyberpunk-styled SOC dashboard.
+
+> No human needed. Detection to remediation in **under 2 seconds**.
 
 ---
 
-## 🏗️ Architecture & Workflow
+## Dashboard Preview
+
+![ZaikOS Dashboard](images/dashboard-main.png)
+
+---
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                         ZaikOS Pipeline                             │
+└─────────────────────────────────────────────────────────────────────┘
+
+  [ Attacker ]
+       │  SSH brute-force / injection
+       ▼
+  ┌─────────────┐   logs    ┌──────────────┐  webhook  ┌─────────────┐
+  │  Target VM  │ ────────► │  Wazuh SIEM  │ ────────► │  Node.js    │
+  │ (Victim)    │           │  (Level 10+) │           │  Backend    │
+  └─────────────┘           └──────────────┘           └──────┬──────┘
+                                                              │ exec
+                                                              ▼
+                                                    ┌─────────────────┐
+                                                    │  analyzer.py    │
+                                                    │  Python Engine  │
+                                                    └────────┬────────┘
+                                                             │
+                                          ┌──────────────────┼──────────────────┐
+                                          ▼                  ▼                  ▼
+                                   ┌────────────┐   ┌─────────────┐   ┌───────────────┐
+                                   │ VirusTotal │   │  AbuseIPDB  │   │  SSH → Target │
+                                   │    API     │   │     API     │   │  ufw deny <IP>│
+                                   └────────────┘   └─────────────┘   └───────────────┘
+                                          │                  │
+                                          └────────┬─────────┘
+                                                   │ verdict
+                                                   ▼
+                                         ┌──────────────────┐
+                                         │  React Dashboard │
+                                         │  (Socket.io WS)  │
+                                         └──────────────────┘
+```
 
 ![Architecture Diagram](images/architecture.png)
 
-ZaikOS operates in a 6-stage lifecycle:
+---
 
-### 1️⃣ The Target (Endpoint)
-A Linux VM running Custom SSH (Port 2222) and an Apache Web Server. This is the designated attack surface.
+## Key Features
 
-### 2️⃣ The SIEM (Wazuh)
-The Wazuh Manager detects anomalous behavior (such as `sshd: maximum authentication attempts exceeded`) and triggers a critical alert.
-![Wazuh Alerts](images/wazuh.png)
-
-### 3️⃣ The Orchestrator
-The custom script catches the alert directly within the Wazuh framework and POSTs the JSON payload to the Node.js API.
-
-### 4️⃣ The Brain (Backend Engine)
-Node.js receives the webhook and executes the analyzer engine.
-
-### 5️⃣ Threat Intelligence & Execution
-The Python engine cross-references the IP with VirusTotal and AbuseIPDB.
-If the risk level is **High** or **Critical**, it SSHs into the Target VM and executes:
-`sudo ufw deny from <IP>`
-
-### 6️⃣ The SOC Dashboard
-Analysts can watch the attack detection, API intelligence queries, and the firewall block—all happening live on the React dashboard.
+| Feature | Description |
+|---|---|
+| 🔍 **Real-Time Log Ingestion** | Wazuh agent monitors `/var/log/auth.log` and Apache logs for brute-force and injection attempts |
+| 🌐 **Dual Threat Intelligence** | Cross-references every attacker IP against **VirusTotal** (93+ vendors) and **AbuseIPDB** simultaneously |
+| ⚡ **Automated Firewall Response** | SSH's into the victim machine via Paramiko and executes `ufw deny` rules automatically |
+| 🔁 **Fault-Tolerant Webhooks** | Exponential backoff on API rate limits (HTTP 429), retry logic, and structured JSON logging |
+| 📡 **Live WebSocket Streaming** | Node.js pushes threat verdicts to the dashboard in real-time via Socket.io |
+| 🖥️ **Cyberpunk SOC Dashboard** | React frontend with animated terminal output, live threat timeline, and system health monitoring |
+| 🛡️ **History Replay** | Dashboard reconnects and restores the last 50 alerts instantly — no data loss on refresh |
 
 ---
 
-## 💻 Technology Stack
+## Technology Stack
 
-### 🛡️ Defensive & Systems
-* **Wazuh** – SIEM, log analysis, file integrity monitoring
-* **Linux UFW** – Automated firewall blocking
-* **Paramiko** – Python SSHv2 protocol library
-
-### ⚙️ Backend (SOAR & API)
-* **Node.js & Express.js** – Webhook listener and REST API
-* **Python 3** – Threat analysis & execution scripts
-* **Socket.io** – Bi-directional WebSocket communication
-* **Requests** – API querying with exponential backoff
-
-### 🎨 Frontend (Visibility)
-* **React.js** – Component-based UI
-* **CSS3** – Custom CRT scanline effects, dark-mode styling
+```
+SIEM / Detection          Wazuh Manager + Agent
+Threat Intelligence       VirusTotal API  •  AbuseIPDB API
+Automated Response        Python 3  •  Paramiko SSHv2  •  Linux UFW
+Backend / Orchestration   Node.js  •  Express.js  •  Socket.io
+Frontend / Visibility     React.js (Vite)  •  CSS3 (CRT effects)
+Transport                 HTTP Webhooks  •  WebSocket (bidirectional)
+```
 
 ---
 
-## 🔬 Deep Dive: System Configurations
+## Pipeline Walkthrough
 
-### 1️⃣ Wazuh Integration (`ossec.conf`)
-To bridge the SIEM with the custom SOAR backend, configure the Wazuh Manager to forward high-severity alerts (Level 10+):
+### Stage 1 — Detection
+The **Target VM** runs a custom SSH server and Apache web server as the attack surface. The Wazuh agent watches auth logs in real time and fires on brute-force patterns.
+
+### Stage 2 — Alert Forwarding
+When Wazuh detects a **Level 10+** event, the custom `custom-soar` integration script POSTs the full JSON alert payload to the Node.js backend.
 
 ```xml
-<ossec_config>
-  <integration>
-    <name>custom-soar</name>
-    <hook_url>http://<BACKEND_IP>:3000/wazuh-alert</hook_url>
-    <level>10</level>
-    <alert_format>json</alert_format>
-  </integration>
-</ossec_config>
+<!-- ossec.conf — add this inside <ossec_config> -->
+<integration>
+  <name>custom-soar</name>
+  <hook_url>http://<BACKEND_IP>:3000/wazuh-alert</hook_url>
+  <level>10</level>
+  <alert_format>json</alert_format>
+</integration>
+```
 
-### 2️⃣ Forwarder Script (`custom-soar.py`)
+### Stage 3 — Threat Analysis
+`analyzer.py` immediately queries both APIs in sequence and computes a risk verdict:
 
-Deployed at `/var/ossec/integrations/custom-soar`, this script handles payload extraction, secure transmission, and internal logging.
+| Verdict | Condition |
+|---|---|
+| 🔴 **CRITICAL RISK** | VT malicious vendors ≥ 1 **AND** AbuseIPDB confidence ≥ 25% |
+| 🟠 **HIGH RISK** | AbuseIPDB confidence ≥ 25% only |
+| 🟡 **MEDIUM RISK** | VT suspicious vendors > 0 |
+| 🟢 **CLEAN** | No signals from either source |
 
-**🔗 [View the full integration script here**](https://www.google.com/search?q=wazuh-integration/custom-soar.py) ### 3️⃣ Analysis Engine (`analyzer.py`)
-Core Python engine features:
+### Stage 4 — Automated Block
+If verdict is `CRITICAL` or `HIGH`, the engine SSH's into the target machine and runs:
 
-* **Lab Spoofing:** Detects local IPs (192.168.x.x) and substitutes known malicious IPs for lab simulations.
-* **Rate Limit Handling:** Implements exponential backoff for VirusTotal API limits (HTTP 429).
-* **Secure SSH Execution:** Uses `AutoAddPolicy()` to execute root-level firewall rules safely.
+```bash
+sudo ufw deny from <ATTACKER_IP> to any
+sudo ufw deny out to <ATTACKER_IP>
+```
+
+Duplicate-rule detection prevents the same IP from being blocked twice.
+
+### Stage 5 — Live Dashboard
+The entire process — API queries, verdict, firewall action — is streamed live to the React dashboard over Socket.io. Analysts see everything as it happens.
+
+![Wazuh Alerts](images/wazuh.png)
 
 ---
 
-## ⚙️ Installation & Deployment
+## Installation & Deployment
 
-### 📌 Prerequisites
+### Prerequisites
 
-* Wazuh Manager instance
-* Target Linux VM with Wazuh Agent installed and UFW enabled
-* Node.js (v18+) and Python (v3.8+)
-* API keys for VirusTotal & AbuseIPDB
+- Wazuh Manager instance (VM or bare metal)
+- Target Linux VM with Wazuh Agent + UFW enabled
+- Node.js v18+ and Python 3.8+
+- API keys for [VirusTotal](https://www.virustotal.com/gui/join-us) and [AbuseIPDB](https://www.abuseipdb.com/register)
 
-### 🚀 Step 1: Deploy Wazuh Integration
+---
+
+### Step 1 — Deploy the Wazuh Integration
 
 ```bash
-# Copy integration script
-sudo cp wazuh-integration/custom-soar.py /var/ossec/integrations/custom-soar
-# Set permissions
-sudo chmod 750 /var/ossec/integrations/custom-soar
-# Restart Wazuh
-sudo systemctl restart wazuh-manager
+# Copy the forwarder script
+sudo cp wazuh-integration/custom-soar /var/ossec/integrations/custom-soar
 
+# Set correct permissions (Wazuh requires this)
+sudo chmod 750 /var/ossec/integrations/custom-soar
+sudo chown root:wazuh /var/ossec/integrations/custom-soar
+
+# Add the integration block to ossec.conf, then restart
+sudo systemctl restart wazuh-manager
 ```
 
-### 🚀 Step 2: Set Up Backend
+---
+
+### Step 2 — Configure Environment Variables
+
+Create a `.env` file in the project root:
+
+```ini
+VT_API_KEY=your_virustotal_api_key_here
+ABUSE_API_KEY=your_abuseipdb_api_key_here
+
+TARGET_HOST=192.168.x.x
+TARGET_PORT=22
+TARGET_USER=your_ssh_user
+TARGET_PASS=your_ssh_password
+```
+
+> ⚠️ **Security Note:** For production, replace password auth with SSH key authentication. Never commit `.env` to version control — it's already in `.gitignore`.
+
+---
+
+### Step 3 — Start the Backend
 
 ```bash
-git clone [https://github.com/ZaikOSS/ZaikOS-SIEM-SOAR.git](https://github.com/ZaikOSS/ZaikOS-SIEM-SOAR.git)
+# Clone the repo
+git clone https://github.com/ZaikOSS/ZaikOS-SIEM-SOAR.git
 cd ZaikOS-SIEM-SOAR
 
-# Install Node dependencies
-npm install express cors socket.io
+# Install Node.js dependencies
+npm install
 
 # Install Python dependencies
-pip3 install requests paramiko
+pip install requests paramiko
 
-# Start SOAR listener
+# Launch the SOAR engine
 node app.js
-
 ```
 
-### 🚀 Step 3: Set Up Frontend Dashboard
+The backend exposes:
+- `POST /wazuh-alert` — Wazuh webhook receiver
+- `GET  /health` — System status + uptime
+- `GET  /api/alerts` — Last 100 alerts (JSON)
+- `WS   socket.io` — Live dashboard feed
+
+---
+
+### Step 4 — Launch the Dashboard
 
 ```bash
 cd soc-dashboard
 npm install
 npm run dev
+```
 
+Open `http://localhost:5173` — the dashboard connects automatically via Socket.io.
+
+---
+
+## Project Structure
+
+```
+ZaikOS-SIEM-SOAR/
+│
+├── app.js                    # Node.js backend + Socket.io server
+├── analyzer.py               # Python threat intelligence engine
+├── package.json
+├── .env                      # API keys & SSH config (not committed)
+│
+├── wazuh-integration/
+│   └── custom-soar           # Wazuh forwarder script (Python)
+│
+└── soc-dashboard/            # React + Vite frontend
+    ├── src/
+    │   └── App.jsx           # Main dashboard component
+    └── package.json
 ```
 
 ---
 
-## 🔐 Environment Variables
-
-Create a `.env` file in the root directory:
-
-```ini
-VT_API_KEY=your_virustotal_api_key_here
-ABUSE_API_KEY=your_abuseipdb_api_key_here
-TARGET_HOST=192.168.100.100
-TARGET_PORT=22
-TARGET_USER=your_ssh_user
-TARGET_PASS=your_ssh_password
+## How the Lab is Wired
 
 ```
-
-*⚠️ In production, use SSH key authentication instead of plaintext passwords.*
+┌─────────────────────────────────────┐
+│         Host Machine (Windows)      │
+│                                     │
+│   ┌─────────────┐  ┌─────────────┐  │
+│   │  Node.js    │  │  React      │  │
+│   │  :3000      │  │  :5173      │  │
+│   └─────────────┘  └─────────────┘  │
+└──────────────┬──────────────────────┘
+               │  Host-Only Network (192.168.100.x)
+    ┌──────────┴───────────┐
+    │                      │
+┌───┴────────┐      ┌──────┴──────┐
+│ Wazuh VM   │      │  Target VM  │
+│ :1514/1515 │      │  SSH :22    │
+│ Manager    │      │  UFW armed  │
+└────────────┘      └─────────────┘
+         ▲
+         │ attacks
+    [ Kali / Attacker VM ]
+```
 
 ---
 
-### 📬 Contact
+## Contact
 
-* **Email:** zakaria.ouadifi@usmba.ac.ma
-* **LinkedIn:** https://www.linkedin.com/in/zakaria-ouadifi/
+<div align="center">
 
-⭐ *If you found this project interesting, feel free to star the repository!*
+**Zakaria Ouadifi**
+
+[![Email](https://img.shields.io/badge/Email-zakaria.ouadifi@usmba.ac.ma-D14836?style=flat-square&logo=gmail&logoColor=white)](mailto:zakaria.ouadifi@usmba.ac.ma)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-zakaria--ouadifi-0077B5?style=flat-square&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/zakaria-ouadifi/)
+
+*If you found this project useful or interesting, a ⭐ on the repo goes a long way.*
+
+</div>
+
+---
+
+<div align="center">
+<sub>Built with paranoia and too much caffeine. // ZaikOS v2.0</sub>
+</div>
